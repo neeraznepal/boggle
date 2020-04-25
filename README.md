@@ -7,8 +7,11 @@ This project is simple boggle game built on Rails as backend language and react 
 - Clone the repo using : git clone [repo_url]
 - Run command on the cloned directory 
 ```
-bundle install
-rails webpacker:install
+$ bundle install
+$ rails webpacker:install
+$ rails webpacker:install:react
+$ rails generate react:install
+$ yarn install
 ```
 - Run command on the cloned directory to run project
 ```
