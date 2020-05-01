@@ -1,6 +1,4 @@
 class StaticController < ActionController::Base
-    get '*page',to: 'static#index', constraints: -> (req) do
-        !req.xhr? && req.format.html?
+    def index
     end
-    root 'static#index'
 end

@@ -1,23 +1,24 @@
-import React from "react"
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
-import { Provider } from 'react-redux'
+import React from "react";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { Provider } from "react-redux";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-import Home from './Home'
-import configureStore from '../configureStore'
+import Home from "./Home";
+import GameBoard from "./GameBoard";
+import configureStore from "../redux/configureStore";
 const store = configureStore();
 
-class App extends React.Component {
-  render() {
-    return (
-      <Provider store={store}>
-        <BrowserRouter>
-          <Switch>
-            <Route exact path="/" render={() => <Home />} />
-          </Switch>
-        </BrowserRouter>
-      </Provider>
-    );
-  }
-}
+const App = () => (
+  <div className="container-fluid">
+    <Provider store={store}>
+      <BrowserRouter>
+        <Switch>
+          <Route exact path="/" render={() => <Home />} />
+          <Route exact path="/game" render={() => <GameBoard />} />
+        </Switch>
+      </BrowserRouter>
+    </Provider>
+  </div>
+);
 
-export default App
+export default App;
