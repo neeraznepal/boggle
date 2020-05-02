@@ -5,16 +5,97 @@ import { useHistory } from "react-router-dom";
 import { LoadBoard } from "../redux/action/gameBoardAction";
 
 const GameBoard = (props) => {
-  const history = useHistory();
-  if (props.userName == null) history.push("/");
+  const [word, setWord] = useState("");
+  const [errors, setErrors] = useState({});
+
+  //const history = useHistory();
+  //if (props.userName == null) history.push("/");
 
   useEffect(() => {
     props.LoadBoard();
   }, []);
 
-  const handleChange = (event) => {};
+  const handleChange = (event) => {
+    setWord(event.target.value);
+  };
   const submitWord = (event) => {
     event.preventDefault();
+    if (formIsValid()) {
+      const clonedBoard = [].concat(props.board);
+      let boardlist = clonedBoard.filter(
+        (item) => item.value == word.charAt(0)
+      );
+      var wordFound = findword(boardlist, 1);
+      console.log(boardlist);
+      //var wordFound = checkIfWordValid(boardlist);
+      if (wordFound) {
+        console.log("found");
+      } else console.log("not found");
+    }
+  };
+  //   const checkIfWordValid = (wordslist) => {
+  //     for (let item of wordslist) {
+  //       if (item.level == word.length) {
+  //         console.log(item.level);
+  //         return true;
+  //       } else if (item.validNeighbor.length > 0) {
+  //         return checkIfWordValid(item.validNeighbor);
+  //       }
+  //     }
+  //   };
+  const findword = (list, nextletterindex) => {
+    for (let item of list) {
+      item.validNeighbor = getValidNeighbour(
+        item,
+        word.charAt(nextletterindex)
+      );
+      item.level = nextletterindex;
+      if (item.level == word.length) {
+        console.log(item.level);
+        return true;
+      }
+
+      if (item.validNeighbor.length > 0) {
+        if (nextletterindex < word.length) {
+          return findword(item.validNeighbor, nextletterindex + 1);
+        }
+      }
+    }
+  };
+  const getValidNeighbour = (current, nextletter) => {
+    if (current.excludeItems == undefined) current.excludeItems = [];
+    let excludeItems = [...current.excludeItems];
+    excludeItems.push(current);
+    const clonedBoard1 = [].concat(props.board);
+    return clonedBoard1
+      .filter((item) => {
+        return (
+          item.value == nextletter &&
+          current.excludeItems.filter(
+            (exitem) => exitem.row == item.row && exitem.column == item.column
+          ).length == 0 &&
+          ((Math.abs(item.row - current.row) == 1 &&
+            Math.abs(item.column - current.column) == 1) ||
+            (Math.abs(item.row - current.row) == 1 &&
+              Math.abs(item.column - current.column) == 0) ||
+            (Math.abs(item.row - current.row) == 0 &&
+              Math.abs(item.column - current.column) == 1))
+        );
+      })
+      .map((item) => {
+        item.excludeItems = excludeItems;
+        return item;
+      });
+  };
+  const formIsValid = () => {
+    const errors = {};
+
+    if (!word || word.trim() == "") errors.word = "Please enter word";
+    else if (word.trim().length < 3) errors.word = "Invalid word";
+
+    setErrors(errors);
+    // Form is valid if the errors object still has no properties
+    return Object.keys(errors).length === 0;
   };
   return (
     <div className="jumbotron">
@@ -61,6 +142,7 @@ const GameBoard = (props) => {
             <h3>Enter Word</h3>
             <input type="text" onChange={handleChange} />
             <input type="submit" value="Submit" />
+            {errors.word && <div className="text-danger">{errors.word}</div>}
           </form>
         </div>
       </div>
