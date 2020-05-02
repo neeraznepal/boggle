@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
 
-import { LoadBoard } from "../redux/action/gameBoardAction";
+import {
+  LoadBoard,
+  ValidateWord,
+  WordValidated,
+} from "../redux/action/gameBoardAction";
 
 const GameBoard = (props) => {
   const [word, setWord] = useState("");
@@ -16,33 +20,45 @@ const GameBoard = (props) => {
   }, []);
 
   const handleChange = (event) => {
-    setWord(event.target.value);
+    setErrors({});
+    setWord(event.target.value.toUpperCase());
   };
   const submitWord = (event) => {
     event.preventDefault();
     if (formIsValid()) {
-      const clonedBoard = [].concat(props.board);
-      let boardlist = clonedBoard.filter(
+      const errors = {};
+      const wordalreadyselected =
+        props.scores.filter((item) => item.word == word).length > 0;
+      if (wordalreadyselected) {
+        errors.word = "Invalid word";
+        setErrors(errors);
+        return;
+      }
+      let boardlist = getCleanBoardItem().filter(
         (item) => item.value == word.charAt(0)
       );
-      var wordFound = findword(boardlist, 1);
-      console.log(boardlist);
-      //var wordFound = checkIfWordValid(boardlist);
+      let wordFound = findword(boardlist, 1);
       if (wordFound) {
-        console.log("found");
-      } else console.log("not found");
+        ValidateWord(word)
+          .then((response) => response.json())
+          .then((data) => {
+            if (!data.success) {
+              errors.word = "Invalid word";
+              setErrors(errors);
+            } else {
+              props.WordValidated(word);
+              setWord("");
+            }
+          })
+          .catch((error) => {
+            throw error;
+          });
+      } else {
+        errors.word = "Invalid word";
+        setErrors(errors);
+      }
     }
   };
-  //   const checkIfWordValid = (wordslist) => {
-  //     for (let item of wordslist) {
-  //       if (item.level == word.length) {
-  //         console.log(item.level);
-  //         return true;
-  //       } else if (item.validNeighbor.length > 0) {
-  //         return checkIfWordValid(item.validNeighbor);
-  //       }
-  //     }
-  //   };
   const findword = (list, nextletterindex) => {
     for (let item of list) {
       item.validNeighbor = getValidNeighbour(
@@ -51,7 +67,6 @@ const GameBoard = (props) => {
       );
       item.level = nextletterindex;
       if (item.level == word.length) {
-        console.log(item.level);
         return true;
       }
 
@@ -66,8 +81,8 @@ const GameBoard = (props) => {
     if (current.excludeItems == undefined) current.excludeItems = [];
     let excludeItems = [...current.excludeItems];
     excludeItems.push(current);
-    const clonedBoard1 = [].concat(props.board);
-    return clonedBoard1
+    const clonedBoard = Object.assign([], props.board);
+    return clonedBoard
       .filter((item) => {
         return (
           item.value == nextletter &&
@@ -87,6 +102,17 @@ const GameBoard = (props) => {
         return item;
       });
   };
+  const getCleanBoardItem = () => {
+    const clonedBoard = Object.assign([], props.board);
+    return clonedBoard.map((item) => {
+      return { row: item.row, column: item.column, value: item.value };
+    });
+  };
+  const getTotalScore = () => {
+    return props.scores.length == 0
+      ? 0
+      : props.scores.map((item) => item.score).reduce((sum, x) => sum + x);
+  };
   const formIsValid = () => {
     const errors = {};
 
@@ -96,6 +122,9 @@ const GameBoard = (props) => {
     setErrors(errors);
     // Form is valid if the errors object still has no properties
     return Object.keys(errors).length === 0;
+  };
+  const textUpperCaseStyles = {
+    textTransform: "uppercase",
   };
   return (
     <div className="jumbotron">
@@ -136,14 +165,44 @@ const GameBoard = (props) => {
             </tbody>
           </table>
         </div>
-        <div className="col-md-2"></div>
-        <div className="col-md-6">
+        <div className="col-md-4">
           <form onSubmit={submitWord}>
             <h3>Enter Word</h3>
-            <input type="text" onChange={handleChange} />
+            <input
+              style={textUpperCaseStyles}
+              type="text"
+              onChange={handleChange}
+              value={word}
+            />
             <input type="submit" value="Submit" />
             {errors.word && <div className="text-danger">{errors.word}</div>}
           </form>
+        </div>
+        <div className="col-md-4">
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                <th>Word</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {props.scores.map((item) => {
+                return (
+                  <tr key={item.word}>
+                    <td>{item.word}</td>
+                    <td>{item.score}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>Total Score</th>
+                <th>{getTotalScore()}</th>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
     </div>
@@ -154,9 +213,11 @@ function mapStateToProps(state) {
   return {
     userName: state.home.userName,
     board: state.gameboard.data,
+    scores: state.gameboard.scores,
   };
 }
 const mapDispatchToProps = {
   LoadBoard,
+  WordValidated,
 };
 export default connect(mapStateToProps, mapDispatchToProps)(GameBoard);

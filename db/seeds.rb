@@ -5,3 +5,23 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+dictionaryData = []
+open("db/dictionary.txt") do |lines|
+    lines.read.each_line do |line|
+        d = Dictionary.new
+        d.word = line.strip
+        dictionaryData.push(d)
+    end
+end
+
+Dictionary.transaction do
+    Dictionary.delete_all
+    dictionaryData.each do |dictionary|
+        dictionary.save!
+    end
+end
+
+
+puts "#{dictionaryData.count} inserted"
+

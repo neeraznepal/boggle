@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'dictionary/validate', to: 'dictionaries#validate'
   # Forward all requests to StaticController#index but requests must be non-Ajax (!req.xhr?) and HTML Mime type (req.format.html?).
   # This does not include the root ("/") path.
   get '*page',to: 'static#index', constraints: -> (req) do

@@ -2,8 +2,13 @@ import * as types from "./actionType";
 
 export function LoadBoard() {
   const data = init();
-  //console.log(data);
   return { type: types.LOAD_BOARD, data: data };
+}
+export function WordValidated(word) {
+  return { type: types.WORD_VALIDATED, word: word };
+}
+export function ValidateWord(word) {
+  return fetch("/dictionary/validate?word=" + word);
 }
 
 const init = () => {
