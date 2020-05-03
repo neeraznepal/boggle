@@ -1,3 +1,4 @@
 export const SET_USER = "SET_USER";
 export const LOAD_BOARD = "LOAD_BOARD";
 export const WORD_VALIDATED = "WORD_VALIDATED";
+export const HIGHEST_SCORER_LOADED = "HIGHEST_SCORER_LOADED";

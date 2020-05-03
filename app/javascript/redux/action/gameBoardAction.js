@@ -10,6 +10,13 @@ export function WordValidated(word) {
 export function ValidateWord(word) {
   return fetch("/dictionary/validate?word=" + word);
 }
+export function SaveScore(score) {
+  return fetch("score/save", {
+    method: "POST", // POST for create, PUT to update when id already exists.
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(score),
+  });
+}
 
 const init = () => {
   const dice = [

@@ -4,7 +4,9 @@ import initialState from "./initialState";
 export default function homeReducer(state = initialState.home, action) {
   switch (action.type) {
     case types.SET_USER:
-      return { userName: action.userName };
+      return { ...state, userName: action.userName };
+    case types.HIGHEST_SCORER_LOADED:
+      return { ...state, highestScorers: action.highestScorers };
     default:
       return state;
   }
