@@ -1,4 +1,4 @@
 export default {
-  home: { userName: null, highestScorers: [] },
+  home: { userName: null },
   board: { data: [], scores: [] },
 };

@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { useHistory, Link } from "react-router-dom";
+import PropTypes from "prop-types";
+
+import Board from "./Board";
+import GameScore from "./GameScore";
 
 import {
   LoadBoard,
   ValidateWord,
   WordValidated,
   SaveScore,
-} from "../redux/action/gameBoardAction";
+} from "../redux/action/gameAction";
 
 const GameBoard = (props) => {
   const [word, setWord] = useState("");
@@ -17,17 +21,23 @@ const GameBoard = (props) => {
   const [scoreSaved, setScoreSaved] = useState(false);
   const history = useHistory();
   if (props.userName == null) history.push("/");
+  let interval = null;
 
   useEffect(() => {
     props.LoadBoard();
     startTimer(120);
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
   }, []);
 
   const startTimer = (duration) => {
     var timer = duration,
       minutes,
       seconds;
-    var interval = setInterval(function () {
+    interval = setInterval(function () {
       minutes = parseInt(timer / 60, 10);
       seconds = parseInt(timer % 60, 10);
 
@@ -37,26 +47,27 @@ const GameBoard = (props) => {
       setTime(minutes + ":" + seconds);
 
       if (--timer < 0) {
-        clearInterval(interval);
-        setGameOver(true);
-        const score = getTotalScore();
-        if (score > 0) {
-          SaveScore({ user: props.userName, score: score })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                setScoreSaved(data.success);
-              }
-            })
-            .catch((error) => {
-              throw error;
-            });
-        } else setScoreSaved(true);
-        console.log("timer finished");
+        endGame();
       }
     }, 1000);
   };
-
+  const endGame = () => {
+    clearInterval(interval);
+    setGameOver(true);
+    const score = getTotalScore();
+    if (score > 0) {
+      SaveScore({ user: props.userName, score: score })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            setScoreSaved(data.success);
+          }
+        })
+        .catch((error) => {
+          throw error;
+        });
+    } else setScoreSaved(true);
+  };
   const handleChange = (event) => {
     setErrors({});
     setWord(event.target.value.toUpperCase());
@@ -181,91 +192,53 @@ const GameBoard = (props) => {
 
       <div className="row">
         <div className="col-md-4">
-          <div className="card">
-            <table className="table table-bordered text-center m-0">
-              <tbody>
-                <tr>
-                  {props.board
-                    .filter((item) => item.row == 1)
-                    .map((item, index) => {
-                      return <td key={index + "1"}>{item.value}</td>;
-                    })}
-                </tr>
-                <tr>
-                  {props.board
-                    .filter((item) => item.row == 2)
-                    .map((item, index) => {
-                      return <td key={index + "1"}>{item.value}</td>;
-                    })}
-                </tr>
-                <tr>
-                  {props.board
-                    .filter((item) => item.row == 3)
-                    .map((item, index) => {
-                      return <td key={index + "1"}>{item.value}</td>;
-                    })}
-                </tr>
-                <tr>
-                  {props.board
-                    .filter((item) => item.row == 4)
-                    .map((item, index) => {
-                      return <td key={index + "1"}>{item.value}</td>;
-                    })}
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <Board board={props.board} />
         </div>
         <div className="col-md-4">
           {!gameOver && (
-            <form onSubmit={submitWord}>
-              <h3>Enter Word</h3>
+            <>
+              <form onSubmit={submitWord}>
+                <h3>Enter Word</h3>
+                <input
+                  style={textUpperCaseStyles}
+                  type="text"
+                  onChange={handleChange}
+                  value={word}
+                />
+                <input type="submit" value="Ok" />
+                {errors.word && (
+                  <div className="text-danger">{errors.word}</div>
+                )}
+              </form>
               <input
-                style={textUpperCaseStyles}
-                type="text"
-                onChange={handleChange}
-                value={word}
+                type="button"
+                value="End game"
+                onClick={endGame}
+                className="btn btn-danger"
               />
-              <input type="submit" value="Ok" />
-              {errors.word && <div className="text-danger">{errors.word}</div>}
-            </form>
+            </>
           )}
           {gameOver && <h3 className="text-danger">Game Over</h3>}
-          {scoreSaved && <Link to="/">Go to home</Link>}
+          {scoreSaved && (
+            <Link className="btn btn-secondary" to="/">
+              Go to home
+            </Link>
+          )}
         </div>
         <div className="col-md-4">
-          <div className="card">
-            <table className="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Word</th>
-                  <th>Score</th>
-                </tr>
-              </thead>
-              <tbody>
-                {props.scores.map((item) => {
-                  return (
-                    <tr key={item.word}>
-                      <td>{item.word}</td>
-                      <td>{item.score}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th>Total Score</th>
-                  <th>{getTotalScore()}</th>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+          <GameScore scores={props.scores} getTotalScore={getTotalScore} />
         </div>
       </div>
     </div>
   );
 };
-
+Board.propTypes = {
+  userName: PropTypes.string.isRequired,
+  board: PropTypes.array.isRequired,
+  scores: PropTypes.array.isRequired,
+  LoadBoard: PropTypes.func.isRequired,
+  WordValidated: PropTypes.func.isRequired,
+};
 function mapStateToProps(state) {
   return {
     userName: state.home.userName,

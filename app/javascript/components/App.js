@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import Home from "./Home";
-import GameBoard from "./GameBoard";
+import Game from "./Game";
 import configureStore from "../redux/configureStore";
 const store = configureStore();
 
@@ -14,7 +14,7 @@ const App = () => (
       <BrowserRouter>
         <Switch>
           <Route exact path="/" render={() => <Home />} />
-          <Route exact path="/game" render={() => <GameBoard />} />
+          <Route exact path="/game" render={() => <Game />} />
         </Switch>
       </BrowserRouter>
     </Provider>

@@ -1,6 +1,21 @@
 {
   "name": "boggle",
   "private": true,
+  "scripts": {
+    "test": "jest --watch"
+  },
+  "jest": {
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "setupFiles": [
+      "./app/javascript/tools/testSetup.js"
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/app/javascript/tools/fileMock.js",
+      "\\.(css|less)$": "<rootDir>/app/javascript/tools/styleMock.js"
+    }
+  },
   "dependencies": {
     "@babel/preset-react": "^7.9.4",
     "@rails/actioncable": "^6.0.0",
@@ -23,6 +38,9 @@
   },
   "version": "0.1.0",
   "devDependencies": {
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "jest": "^25.5.4",
     "webpack-dev-server": "^3.10.3"
   }
 }
