@@ -19,6 +19,7 @@ const Game = (props) => {
   const [time, setTime] = useState("");
   const [gameOver, setGameOver] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
+  const [clonedBoard, setClonedBoard] = useState([]);
   const history = useHistory();
   if (props.userName == null) history.push("/");
   let interval = null;
@@ -83,7 +84,11 @@ const Game = (props) => {
         setErrors(errors);
         return;
       }
-      let boardlist = getCleanBoardItem().filter(
+      const cleanBoardItem = Object.assign([], props.board).map((item) => {
+        return { row: item.row, column: item.column, value: item.value };
+      });
+      setClonedBoard(cleanBoardItem);
+      let boardlist = clonedBoard.filter(
         (item) => item.value == word.charAt(0)
       );
       let wordFound = findword(boardlist, 1);
@@ -114,6 +119,7 @@ const Game = (props) => {
         item,
         word.charAt(nextletterindex)
       );
+
       item.level = nextletterindex;
       if (item.level == word.length) {
         return true;
@@ -130,31 +136,25 @@ const Game = (props) => {
     if (current.excludeItems == undefined) current.excludeItems = [];
     let excludeItems = [...current.excludeItems];
     excludeItems.push(current);
-    const clonedBoard = Object.assign([], props.board);
-    return clonedBoard
-      .filter((item) => {
-        return (
-          item.value == nextletter &&
-          current.excludeItems.filter(
-            (exitem) => exitem.row == item.row && exitem.column == item.column
-          ).length == 0 &&
-          ((Math.abs(item.row - current.row) == 1 &&
-            Math.abs(item.column - current.column) == 1) ||
-            (Math.abs(item.row - current.row) == 1 &&
-              Math.abs(item.column - current.column) == 0) ||
-            (Math.abs(item.row - current.row) == 0 &&
-              Math.abs(item.column - current.column) == 1))
-        );
-      })
-      .map((item) => {
-        item.excludeItems = excludeItems;
-        return item;
-      });
-  };
-  const getCleanBoardItem = () => {
-    const clonedBoard = Object.assign([], props.board);
-    return clonedBoard.map((item) => {
-      return { row: item.row, column: item.column, value: item.value };
+
+    let filtered = clonedBoard.filter((item) => {
+      return (
+        item.value == nextletter &&
+        current.excludeItems.filter(
+          (exitem) => exitem.row == item.row && exitem.column == item.column
+        ).length == 0 &&
+        ((Math.abs(item.row - current.row) == 1 &&
+          Math.abs(item.column - current.column) == 1) ||
+          (Math.abs(item.row - current.row) == 1 &&
+            Math.abs(item.column - current.column) == 0) ||
+          (Math.abs(item.row - current.row) == 0 &&
+            Math.abs(item.column - current.column) == 1))
+      );
+    });
+
+    return [...filtered].map((item) => {
+      item.excludeItems = excludeItems;
+      return item;
     });
   };
   const getTotalScore = () => {
