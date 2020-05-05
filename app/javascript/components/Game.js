@@ -13,7 +13,7 @@ import {
   SaveScore,
 } from "../redux/action/gameAction";
 
-const Game = (props) => {
+export const Game = (props) => {
   const [word, setWord] = useState("");
   const [errors, setErrors] = useState({});
   const [time, setTime] = useState("");

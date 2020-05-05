@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const Board = (props) => {
+const GameScore = (props) => {
   return (
     <div className="card">
       <table className="table table-bordered">
@@ -34,8 +34,8 @@ const Board = (props) => {
   );
 };
 
-Board.propTypes = {
+GameScore.propTypes = {
   scores: PropTypes.array.isRequired,
   getTotalScore: PropTypes.func.isRequired,
 };
-export default Board;
+export default GameScore;

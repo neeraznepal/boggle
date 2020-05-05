@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
+import PropTypes from "prop-types";
 
 import { SetUser, GetHighestScorers } from "../redux/action/homeAction";
+import HighScorers from "./HighScorers";
+import StartGameForm from "./StartGameForm";
 
-const Home = (props) => {
+export const Home = (props) => {
   const history = useHistory();
   const [userName, setUserName] = useState("");
   const [errors, setErrors] = useState({});
@@ -13,18 +16,22 @@ const Home = (props) => {
 
   useEffect(() => {
     let unmounted = false;
-    GetHighestScorers()
-      .then((response) => response.json())
-      .then((data) => {
-        if (!unmounted) {
-          setHighestScorers(data);
-          setHighestScorerLoaded(true);
-        }
-      })
-      .catch((error) => {
-        if (!unmounted) throw error;
-      });
-
+    if (props.highestScorers == null) {
+      GetHighestScorers()
+        .then((response) => response.json())
+        .then((data) => {
+          if (!unmounted) {
+            setHighestScorers(data);
+            setHighestScorerLoaded(true);
+          }
+        })
+        .catch((error) => {
+          if (!unmounted) throw error;
+        });
+    } else {
+      setHighestScorers(props.highestScorers);
+      setHighestScorerLoaded(true);
+    }
     return () => {
       unmounted = true;
       setHighestScorerLoaded(false);
@@ -57,14 +64,11 @@ const Home = (props) => {
       <p>Welcome. Please enter your name to start the game</p>
       <div className="row">
         <div className="col-md-4">
-          <form onSubmit={startGame}>
-            <h3>Enter Name</h3>
-            <input type="text" onChange={handleChange} />
-            <input type="submit" value="Start" />
-            {errors.userName && (
-              <div className="text-danger">{errors.userName}</div>
-            )}
-          </form>
+          <StartGameForm
+            formSubmit={startGame}
+            handleTextChange={handleChange}
+            formErrors={errors}
+          />
         </div>
         <div className="col-md-4">
           <h3>Game Description</h3>
@@ -81,45 +85,18 @@ const Home = (props) => {
           </ul>
         </div>
         <div className="col-md-4">
-          <h3>Highest Scorers</h3>
-          <div className="card">
-            <table className="table table-bordered">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Score</th>
-                </tr>
-              </thead>
-              <tbody>
-                {highestScorers.map((item) => {
-                  return (
-                    <tr key={item.id}>
-                      <td>{item.user}</td>
-                      <td>{item.point}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              {highestScorers.length == 0 && highestScorerLoaded && (
-                <tfoot>
-                  <tr>
-                    <th colSpan="2">No one has played the game yet</th>
-                  </tr>
-                </tfoot>
-              )}
-              {!highestScorerLoaded && (
-                <tfoot>
-                  <tr>
-                    <th colSpan="2">Loading...</th>
-                  </tr>
-                </tfoot>
-              )}
-            </table>
-          </div>
+          <HighScorers
+            highestScorers={highestScorers}
+            highestScorerLoaded={highestScorerLoaded}
+          />
         </div>
       </div>
     </div>
   );
+};
+
+Home.propTypes = {
+  SetUser: PropTypes.func.isRequired,
 };
 
 function mapStateToProps(state) {
