@@ -10,13 +10,13 @@ This project is simple boggle game built on Rails as backend language and react 
 - Run command on the cloned directory
 
 ```
-$ rake db:migrate
-$ rake db:seed
 $ bundle install
 $ rails webpacker:install
 $ rails webpacker:install:react
 $ rails generate react:install
 $ yarn install
+$ rake db:migrate
+$ rake db:seed
 ```
 
 - Run command on the cloned directory to run project

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
-import PropTypes from "prop-types";
 
 import { SetUser, GetHighestScorers } from "../redux/action/homeAction";
 
@@ -121,11 +120,6 @@ const Home = (props) => {
       </div>
     </div>
   );
-};
-
-Board.propTypes = {
-  userName: PropTypes.string.isRequired,
-  SetUser: PropTypes.func.isRequired,
 };
 
 function mapStateToProps(state) {

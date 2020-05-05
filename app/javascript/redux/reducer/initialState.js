@@ -1,4 +1,4 @@
 export default {
   home: { userName: null },
-  board: { data: [], scores: [] },
+  game: { data: [], scores: [] },
 };

@@ -13,7 +13,7 @@ import {
   SaveScore,
 } from "../redux/action/gameAction";
 
-const GameBoard = (props) => {
+const Game = (props) => {
   const [word, setWord] = useState("");
   const [errors, setErrors] = useState({});
   const [time, setTime] = useState("");
@@ -232,7 +232,7 @@ const GameBoard = (props) => {
     </div>
   );
 };
-Board.propTypes = {
+Game.propTypes = {
   userName: PropTypes.string.isRequired,
   board: PropTypes.array.isRequired,
   scores: PropTypes.array.isRequired,
@@ -242,12 +242,12 @@ Board.propTypes = {
 function mapStateToProps(state) {
   return {
     userName: state.home.userName,
-    board: state.gameboard.data,
-    scores: state.gameboard.scores,
+    board: state.game.data,
+    scores: state.game.scores,
   };
 }
 const mapDispatchToProps = {
   LoadBoard,
   WordValidated,
 };
-export default connect(mapStateToProps, mapDispatchToProps)(GameBoard);
+export default connect(mapStateToProps, mapDispatchToProps)(Game);
