@@ -19,10 +19,16 @@ $ rake db:migrate
 $ rake db:seed
 ```
 
+- Run command on the cloned directory to run test
+
+```
+$ npm test
+```
+
 - Run command on the cloned directory to run project
 
 ```
-rails server -p 3000
+$ rails server -p 3000
 ```
 
 -Browse http://localhost:3000/
