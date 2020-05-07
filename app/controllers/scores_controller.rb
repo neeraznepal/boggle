@@ -7,7 +7,7 @@ class ScoresController < ApplicationController
         if(user.nil? || user.empty?)
             render json: { :success => false, :message => 'User is required'}.to_json()
         elsif(point.nil?)
-            render json: { :success => false, :message => 'Point is required'}.to_json()
+            render json: { :success => false, :message => 'Score is required'}.to_json()
         else
             score = Score.new
             score.user = user

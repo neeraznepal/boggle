@@ -23,6 +23,7 @@ $ rake db:seed
 
 ```
 $ npm test
+$ rspec
 ```
 
 - Run command on the cloned directory to run project

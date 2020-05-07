@@ -69,6 +69,11 @@ export const Game = (props) => {
         });
     } else setScoreSaved(true);
   };
+  const confirmEndGame = () => {
+    if (confirm("Are you sure you want to end this game?")) {
+      endGame();
+    }
+  };
   const handleChange = (event) => {
     setErrors({});
     setWord(event.target.value.toUpperCase());
@@ -175,6 +180,9 @@ export const Game = (props) => {
   const textUpperCaseStyles = {
     textTransform: "uppercase",
   };
+  const endGameButtonStyles = {
+    marginTop: 50,
+  };
   return (
     <div className="jumbotron">
       <div className="row">
@@ -199,31 +207,45 @@ export const Game = (props) => {
             <>
               <form onSubmit={submitWord}>
                 <h3>Enter Word</h3>
-                <input
-                  style={textUpperCaseStyles}
-                  type="text"
-                  onChange={handleChange}
-                  value={word}
-                />
-                <input type="submit" value="Ok" />
+                <div className="input-group mb-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    style={textUpperCaseStyles}
+                    onChange={handleChange}
+                    value={word}
+                  />
+                  <div className="input-group-append">
+                    <input
+                      className="btn btn-secondary"
+                      type="submit"
+                      value="Ok"
+                    />
+                  </div>
+                </div>
                 {errors.word && (
                   <div className="text-danger">{errors.word}</div>
                 )}
               </form>
-              <input
-                type="button"
-                value="End game"
-                onClick={endGame}
-                className="btn btn-danger"
-              />
+              <div className="row">
+                <div className="col-md-12 text-center">
+                  <input
+                    style={endGameButtonStyles}
+                    type="button"
+                    value="End game"
+                    onClick={confirmEndGame}
+                    className="btn btn-danger"
+                  />
+                </div>
+              </div>
             </>
           )}
-          {gameOver && <h3 className="text-danger">Game Over</h3>}
-          {scoreSaved && (
-            <Link className="btn btn-secondary" to="/">
-              Go to home
-            </Link>
-          )}
+          <div className="row">
+            <div className="col-md-12 text-center">
+              {gameOver && <h3 className="text-danger">Game Over</h3>}
+              {scoreSaved && <Link to="/">Return to home</Link>}
+            </div>
+          </div>
         </div>
         <div className="col-md-4">
           <GameScore scores={props.scores} getTotalScore={getTotalScore} />
@@ -233,7 +255,6 @@ export const Game = (props) => {
   );
 };
 Game.propTypes = {
-  userName: PropTypes.string.isRequired,
   board: PropTypes.array.isRequired,
   scores: PropTypes.array.isRequired,
   LoadBoard: PropTypes.func.isRequired,
