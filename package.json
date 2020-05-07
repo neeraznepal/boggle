@@ -2,7 +2,7 @@
   "name": "boggle",
   "private": true,
   "scripts": {
-    "test": "jest --watch"
+    "test": "jest"
   },
   "jest": {
     "modulePaths": [
